@@ -1,0 +1,387 @@
+TERMS AND CONDITIONS FOR 8 BALL PATH FINDER
+Last Updated: December 2025
+
+==================================
+1. ACCEPTANCE OF TERMS
+==================================
+
+These Terms and Conditions ("Terms") constitute a legally binding agreement between you ("User," "you," or "your") and 8 Ball Path Finder ("we," "us," "our," or "the App"). By downloading, installing, accessing, or using the App, you acknowledge that you have read, understood, and agree to be bound by these Terms.
+
+IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE THE APP.
+
+==================================
+2. APP DESCRIPTION AND PURPOSE
+==================================
+
+8 Ball Path Finder is a mobile application designed to assist pool and billiards players by:
+- Using artificial intelligence to detect pool balls on a table
+- Calculating and displaying trajectory paths for shots
+- Providing visual guides to improve aiming and game strategy
+- Offering both manual and automatic detection modes
+
+IMPORTANT DISCLAIMER: The trajectory lines and calculations provided by the App are mathematical approximations based on ball positions, table boundaries, and physics calculations. Actual ball paths may vary due to ball spin, surface friction, table imperfections, detection precision, and other real-world physics variables. The App is intended as a practice and learning tool, not a guarantee of shot accuracy.
+
+==================================
+3. ELIGIBILITY AND AGE REQUIREMENTS
+==================================
+
+3.1 MINIMUM AGE
+You must be at least 13 years of age to use this App. By using the App, you represent and warrant that you are at least 13 years old.
+
+3.2 PARENTAL CONSENT
+If you are between 13 and 18 years of age (or the age of majority in your jurisdiction), you must have permission from a parent or legal guardian to use the App.
+
+3.3 COMPLIANCE
+You must comply with all applicable laws and regulations in your jurisdiction while using the App.
+
+==================================
+4. LICENSE AND USAGE RIGHTS
+==================================
+
+4.1 LIMITED LICENSE
+Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to:
+- Download and install the App on your personal mobile device
+- Use the App for personal, non-commercial purposes
+- Access features available in your subscription tier (Free or Premium)
+
+4.2 RESTRICTIONS
+You agree NOT to:
+- Modify, reverse engineer, decompile, or disassemble the App
+- Remove, alter, or obscure any proprietary notices or labels
+- Use the App for any commercial purpose without written permission
+- Distribute, rent, lease, or sublicense the App to third parties
+- Use the App to violate any applicable laws or regulations
+- Attempt to bypass security features or access restrictions
+- Use automated systems to access the App (bots, scrapers, etc.)
+- Interfere with or disrupt the App's functionality
+- Use the App in competitive tournaments or gambling without proper authorization
+
+4.3 INTELLECTUAL PROPERTY
+All content, features, and functionality of the App, including but not limited to:
+- AI/ML models and algorithms
+- Software code and architecture
+- User interface design
+- Graphics, logos, and branding
+- Trajectory calculation methods
+
+Are owned by 8 Ball Path Finder and are protected by copyright, trademark, and other intellectual property laws.
+
+==================================
+5. USER ACCOUNTS AND AUTHENTICATION
+==================================
+
+5.1 ACCOUNT CREATION
+- You may sign in using Google Authentication (Firebase)
+- You are responsible for maintaining the security of your account
+- You must provide accurate and complete information
+- You are responsible for all activities under your account
+
+5.2 ACCOUNT SECURITY
+- Keep your login credentials confidential
+- Notify us immediately of unauthorized access
+- We are not liable for losses due to unauthorized account use
+
+5.3 ACCOUNT TERMINATION
+We reserve the right to suspend or terminate your account if you:
+- Violate these Terms
+- Engage in fraudulent or illegal activities
+- Abuse the App or its features
+- Attempt to circumvent premium features
+
+==================================
+6. PREMIUM SUBSCRIPTIONS AND BILLING
+==================================
+
+6.1 SUBSCRIPTION TIERS
+The App offers:
+- Free Version: Basic features with advertisements
+- Premium Monthly: Full features, ad-free experience
+- Premium Yearly: Full features, ad-free experience (discounted)
+
+6.2 PAYMENT AND BILLING
+- All payments are processed through Google Play Billing
+- Subscriptions automatically renew unless cancelled
+- You will be charged at the start of each billing period
+- Prices are subject to change with 30 days notice
+- All fees are non-refundable except as required by law
+
+6.3 CANCELLATION
+- You may cancel your subscription at any time through Google Play Store
+- Cancellation takes effect at the end of the current billing period
+- No partial refunds for unused subscription time
+- Access to premium features continues until subscription expires
+
+6.4 SUBSCRIPTION VALIDATION
+- Premium status is verified through Firebase and Google Play Billing
+- Account must remain in good standing for continued access
+- We reserve the right to verify subscription legitimacy
+
+6.5 REFUND POLICY
+- Refunds are handled according to Google Play Store policies
+- Generally, refunds are not provided except as required by law
+- Contact Google Play Store customer support for refund requests
+- We may grant refunds at our sole discretion for exceptional circumstances
+
+==================================
+7. ADVERTISEMENTS (Free Version)
+==================================
+
+7.1 AD DISPLAY
+The free version of the App displays advertisements provided by Unity Ads and other advertising partners.
+
+7.2 AD BEHAVIOR
+- Ads may appear before accessing features
+- Ads may contain links to third-party websites
+- We are not responsible for third-party ad content
+- Ad frequency is designed to be non-intrusive
+
+7.3 AD-FREE EXPERIENCE
+Upgrade to Premium to remove all advertisements.
+
+==================================
+8. PERMISSIONS AND PRIVACY
+==================================
+
+8.1 REQUIRED PERMISSIONS
+The App requires the following Android permissions:
+- Screen Overlay: Display trajectory lines over other apps
+- Screen Capture: Detect pool balls in real-time (Auto Line mode only)
+- Internet: Authentication, ads, subscription validation
+- Notifications: Service status and subscription updates
+- Vibration: Haptic feedback
+
+8.2 PRIVACY
+Your use of the App is subject to our Privacy Policy, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand how we collect, use, and protect your information.
+
+8.3 SCREEN CAPTURE
+- Screen captures are processed locally on your device
+- Screen captures are NOT uploaded to any server
+- Screen captures are immediately discarded after processing
+- You are responsible for ensuring you have permission to capture screens
+
+==================================
+9. USER RESPONSIBILITIES AND PROHIBITED CONDUCT
+==================================
+
+9.1 RESPONSIBLE USE
+You agree to:
+- Use the App only for lawful purposes
+- Respect intellectual property rights
+- Provide accurate account information
+- Report bugs or security vulnerabilities responsibly
+
+9.2 PROHIBITED CONDUCT
+You must NOT:
+- Use the App in sanctioned competitive tournaments without permission
+- Use the App for gambling or illegal activities
+- Share premium account access with others
+- Attempt to cheat, hack, or exploit the App
+- Harass, threaten, or harm others
+- Impersonate any person or entity
+- Upload malicious code or viruses
+- Engage in any activity that violates these Terms
+
+==================================
+10. DISCLAIMERS AND WARRANTIES
+==================================
+
+10.1 "AS IS" BASIS
+THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
+- Merchantability
+- Fitness for a particular purpose
+- Non-infringement
+- Accuracy or reliability
+- Uninterrupted or error-free operation
+
+10.2 ACCURACY DISCLAIMER
+WE DO NOT GUARANTEE:
+- Accuracy of trajectory calculations
+- Perfect ball detection in all conditions
+- Shot success based on displayed lines
+- Compatibility with all devices or Android versions
+- Availability of the App at all times
+
+10.3 THIRD-PARTY SERVICES
+We are not responsible for:
+- Third-party advertising content
+- Google Play Billing issues
+- Firebase service interruptions
+- Third-party website content or policies
+
+10.4 DEVICE COMPATIBILITY
+- The App requires Android 11+ for Auto Line features
+- The App requires Android 5.0+ for Guide Line features
+- Performance may vary based on device specifications
+- We are not responsible for device-specific issues
+
+==================================
+11. LIMITATION OF LIABILITY
+==================================
+
+11.1 GENERAL LIMITATION
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, WE SHALL NOT BE LIABLE FOR:
+- Indirect, incidental, special, consequential, or punitive damages
+- Loss of profits, revenue, data, or business opportunities
+- Service interruptions or unavailability
+- Errors, mistakes, or inaccuracies in the App
+- Unauthorized access to your account
+- Any third-party content or conduct
+
+11.2 MAXIMUM LIABILITY
+IN NO EVENT SHALL OUR TOTAL LIABILITY EXCEED THE AMOUNT YOU PAID FOR THE APP IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM, OR $100 USD, WHICHEVER IS LESS.
+
+11.3 JURISDICTIONAL LIMITATIONS
+Some jurisdictions do not allow the exclusion of certain warranties or limitations of liability. In such jurisdictions, our liability will be limited to the maximum extent permitted by law.
+
+==================================
+12. INDEMNIFICATION
+==================================
+
+You agree to indemnify, defend, and hold harmless 8 Ball Path Finder, its affiliates, officers, directors, employees, and agents from and against any claims, liabilities, damages, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising from:
+- Your use or misuse of the App
+- Your violation of these Terms
+- Your violation of any rights of another party
+- Your violation of any applicable laws or regulations
+- Content you submit or transmit through the App
+
+==================================
+13. APP UPDATES AND MODIFICATIONS
+==================================
+
+13.1 UPDATES
+- We may release updates, patches, or new versions
+- Updates may be automatic or require manual installation
+- Continued use after updates constitutes acceptance of changes
+- Some updates may require additional permissions
+
+13.2 MODIFICATIONS TO TERMS
+- We reserve the right to modify these Terms at any time
+- Material changes will be notified through the App
+- Continued use after changes constitutes acceptance
+- You should review Terms periodically
+
+13.3 SERVICE CHANGES
+We reserve the right to:
+- Modify, suspend, or discontinue any feature
+- Change subscription pricing with notice
+- Adjust free vs. premium feature allocation
+- Discontinue the App entirely with reasonable notice
+
+==================================
+14. TERMINATION
+==================================
+
+14.1 TERMINATION BY YOU
+You may stop using the App at any time by:
+- Uninstalling the App from your device
+- Cancelling your subscription through Google Play Store
+- Deleting your account (if applicable)
+
+14.2 TERMINATION BY US
+We may suspend or terminate your access if:
+- You violate these Terms
+- You engage in fraudulent activity
+- Your account is inactive for extended periods
+- Required by law or legal process
+- We discontinue the App
+
+14.3 EFFECT OF TERMINATION
+Upon termination:
+- Your license to use the App is revoked
+- Your account and data may be deleted
+- Outstanding payments remain due
+- Provisions of these Terms that should survive will remain in effect
+
+==================================
+15. DISPUTE RESOLUTION
+==================================
+
+15.1 INFORMAL RESOLUTION
+Before filing a formal dispute, you agree to contact us and attempt to resolve the issue informally. Please contact us at [YOUR SUPPORT EMAIL] with details of your concern.
+
+15.2 GOVERNING LAW
+These Terms shall be governed by and construed in accordance with the laws of [YOUR JURISDICTION], without regard to its conflict of law provisions.
+
+15.3 ARBITRATION (if applicable)
+Any dispute arising from these Terms or the App may be subject to binding arbitration in accordance with [ARBITRATION RULES], at your option or as required by law.
+
+15.4 CLASS ACTION WAIVER
+TO THE EXTENT PERMITTED BY LAW, ALL CLAIMS MUST BE BROUGHT IN AN INDIVIDUAL CAPACITY, AND NOT AS A CLASS ACTION OR COLLECTIVE ACTION.
+
+==================================
+16. MISCELLANEOUS PROVISIONS
+==================================
+
+16.1 ENTIRE AGREEMENT
+These Terms, together with our Privacy Policy, constitute the entire agreement between you and us regarding the App.
+
+16.2 SEVERABILITY
+If any provision of these Terms is found to be unenforceable, the remaining provisions will remain in full force and effect.
+
+16.3 WAIVER
+Our failure to enforce any right or provision of these Terms will not constitute a waiver of such right or provision.
+
+16.4 ASSIGNMENT
+You may not assign or transfer these Terms without our written consent. We may assign our rights and obligations without restriction.
+
+16.5 FORCE MAJEURE
+We are not liable for failure to perform obligations due to causes beyond our reasonable control, including natural disasters, war, terrorism, riots, embargoes, acts of government, or network failures.
+
+16.6 EXPORT COMPLIANCE
+You agree to comply with all export and import laws and regulations applicable to the App.
+
+16.7 U.S. GOVERNMENT RIGHTS
+If you are a U.S. government entity, the App is a "Commercial Item" as defined in FAR 2.101.
+
+16.8 CONTACT FOR LEGAL NOTICES
+All legal notices should be sent to: [YOUR LEGAL CONTACT EMAIL]
+
+==================================
+17. SPECIFIC DISCLAIMERS
+==================================
+
+17.1 NOT PROFESSIONAL ADVICE
+The App provides entertainment and practice assistance. It does not constitute professional coaching, gambling advice, or guarantee of game performance.
+
+17.2 TOURNAMENT USE
+Check tournament rules before using the App in competitive play. Many tournaments prohibit electronic assistance devices.
+
+17.3 RESPONSIBLE GAMING
+If using the App in connection with gambling:
+- Gamble responsibly
+- The App does not guarantee wins
+- We are not responsible for gambling losses
+- Seek help if you have a gambling problem
+
+17.4 PHYSICS ACCURACY
+Trajectory calculations are approximations and do not account for all real-world variables including:
+- Ball spin (topspin, backspin, sidespin)
+- Cloth friction and wear patterns
+- Table levelness and imperfections
+- Humidity and temperature effects
+- Ball weight variations
+- Cue ball deflection (squirt/throw)
+
+==================================
+18. CONTACT INFORMATION
+==================================
+
+For questions about these Terms, please contact us:
+
+General Support: [YOUR SUPPORT EMAIL]
+Legal Inquiries: [YOUR LEGAL EMAIL]
+Website: http://boredjejemon.com/8BallPathFinder/
+
+Response time: Within 5 business days for most inquiries.
+
+==================================
+19. ACKNOWLEDGMENT
+==================================
+
+BY USING 8 BALL PATH FINDER, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS AND CONDITIONS.
+
+==================================
+END OF TERMS AND CONDITIONS
+==================================
+
+© 2025 8 Ball Path Finder. All rights reserved.

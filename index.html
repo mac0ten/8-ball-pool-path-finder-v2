@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8 Ball Path Finder | Line Tool</title>
+    <meta name="description"
+        content="Master every shot with precision. AI-powered trajectory prediction for 8-ball pool.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #0a0f0d;
+            --text-main: #f5f5f0;
+            --text-muted: #8a9a8f;
+            --accent: #f4d03f;
+            --accent-glow: #ffec8b;
+            --ball-8: #1a1a1a;
+            --font-display: 'Bebas Neue', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor.hovering {
+            width: 50px;
+            height: 50px;
+            background: rgba(244, 208, 63, 0.1);
+        }
+
+        .glow-orb {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(244, 208, 63, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            transform: translate(-50%, -50%);
+            filter: blur(40px);
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            line-height: 0.95;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-weight: 300;
+            line-height: 1.7;
+            color: var(--text-muted);
+        }
+
+        /* Layout */
+        .page-wrapper {
+            position: relative;
+            z-index: 2;
+        }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 6vw;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 1.2s var(--ease-out-expo);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-80px);
+            transition: all 1.2s var(--ease-out-expo);
+        }
+
+        .reveal-left.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(80px);
+            transition: all 1.2s var(--ease-out-expo);
+        }
+
+        .reveal-right.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .stagger-children>* {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s var(--ease-out-expo);
+        }
+
+        .stagger-children.active>*:nth-child(1) {
+            transition-delay: 0s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-children.active>*:nth-child(2) {
+            transition-delay: 0.1s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-children.active>*:nth-child(3) {
+            transition-delay: 0.2s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-children.active>*:nth-child(4) {
+            transition-delay: 0.3s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-children.active>*:nth-child(5) {
+            transition-delay: 0.4s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Overlays */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 2px);
+            opacity: 0.5;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            background: radial-gradient(circle at 50% 50%, rgba(10, 15, 13, 0.3) 0%, rgba(10, 15, 13, 0.95) 100%);
+            pointer-events: none;
+        }
+
+        /* Scroll Progress */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+            z-index: 10001;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 1.1rem 2.5rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #e6c22e 100%);
+            border: none;
+            border-radius: 60px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--bg-body);
+            text-decoration: none;
+            transition: all 0.4s var(--ease);
+            font-family: var(--font-body);
+            cursor: none;
+            box-shadow: 0 4px 30px rgba(244, 208, 63, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 40px rgba(244, 208, 63, 0.5);
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: var(--bg-body);
+            border-color: var(--text-main);
+        }
+
+        .magnetic {
+            transition: transform 0.3s var(--ease);
+        }
+
+        /* Header */
+        header {
+            padding: 1.2rem 6vw;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            background: rgba(10, 15, 13, 0.6);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.5s var(--ease);
+        }
+
+        header.scrolled {
+            padding: 0.8rem 6vw;
+            background: rgba(10, 15, 13, 0.95);
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--ball-8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #333;
+            box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .logo-icon span {
+            background: white;
+            color: black;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+        }
+
+        .nav-cta {
+            font-size: 0.8rem;
+            padding: 0.8rem 1.8rem;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(3.5rem, 8vw, 7rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-main) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 200%;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .split-text .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(50px) rotateX(-90deg);
+            animation: charReveal 0.8s var(--ease-out-expo) forwards;
+        }
+
+        @keyframes charReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 450px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            height: 500px;
+        }
+
+        .rating-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(4px);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 4px 30px rgba(244, 208, 63, 0.2);
+            }
+        }
+
+        .rating-badge svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--accent);
+        }
+
+        .rating-badge span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Floating Elements */
+        .floating-ball {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: floatAround 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatAround {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(20px, -30px) rotate(90deg);
+            }
+
+            50% {
+                transform: translate(-10px, 20px) rotate(180deg);
+            }
+
+            75% {
+                transform: translate(30px, 10px) rotate(270deg);
+            }
+        }
+
+        /* Marquee */
+        .marquee-section {
+            padding: 3rem 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .marquee {
+            display: flex;
+            animation: marquee 30s linear infinite;
+        }
+
+        .marquee-content {
+            display: flex;
+            gap: 4rem;
+            padding-right: 4rem;
+            white-space: nowrap;
+        }
+
+        .marquee-item {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .marquee-item span {
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        @keyframes marquee {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Stats */
+        .stats-section {
+            padding: 6rem 6vw;
+            background: linear-gradient(180deg, transparent 0%, rgba(13, 74, 43, 0.1) 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            position: relative;
+        }
+
+        .stat-item::after {
+            content: '';
+            position: absolute;
+            right: -1.5rem;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child::after {
+            display: none;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number[data-count] {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s var(--ease);
+        }
+
+        .stat-number[data-count].counted {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Features */
+        .features-section {
+            padding: 10rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--accent);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(244, 208, 63, 0.3), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                left: 100%;
+            }
+        }
+
+        .section-header h2 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 3rem;
+            transition: all 0.5s var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(244, 208, 63, 0.15) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s var(--ease);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(244, 208, 63, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+            transition: all 0.3s var(--ease);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 30px rgba(244, 208, 63, 0.3);
+        }
+
+        .feature-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: currentColor;
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            letter-spacing: 0.02em;
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+        }
+
+        /* Steps */
+        .steps-section {
+            padding: 10rem 0;
+            background: linear-gradient(180deg, var(--bg-body) 0%, #0d1512 100%);
+        }
+
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 4rem;
+            padding: 4rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: start;
+            position: relative;
+        }
+
+        .step-row::before {
+            content: '';
+            position: absolute;
+            left: 60px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .step-row:hover::before {
+            opacity: 0.3;
+        }
+
+        .step-row:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            font-family: var(--font-display);
+            font-size: 5rem;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(244, 208, 63, 0.5);
+            opacity: 0.8;
+            transition: all 0.5s var(--ease);
+        }
+
+        .step-row:hover .step-num {
+            color: var(--accent);
+            -webkit-text-stroke: 0px;
+            opacity: 1;
+            text-shadow: 0 0 40px rgba(244, 208, 63, 0.5);
+        }
+
+        .step-content h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-content p {
+            font-size: 1.1rem;
+            max-width: 500px;
+        }
+
+        /* Download */
+        .download-section {
+            padding: 10rem 0;
+            text-align: center;
+        }
+
+        .download-section h2 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            margin-bottom: 1.5rem;
+        }
+
+        .download-section p {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .download-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: #000;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s var(--ease);
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-badge::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(244, 208, 63, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .download-badge:hover::before {
+            opacity: 1;
+        }
+
+        .download-badge:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+            box-shadow: 0 0 40px rgba(244, 208, 63, 0.3);
+        }
+
+        .download-badge svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .download-badge-text {
+            text-align: left;
+        }
+
+        .download-badge-text small {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        .download-badge-text span {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 6vw;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            position: relative;
+            cursor: none;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s var(--ease);
+        }
+
+        .footer-links a:hover {
+            color: var(--text-main);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-copy {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Back to Top */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-body);
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s var(--ease);
+            z-index: 100;
+            cursor: none;
+            box-shadow: 0 4px 20px rgba(244, 208, 63, 0.3);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(244, 208, 63, 0.5);
+        }
+
+        .back-to-top svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        /* Three.js */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            body {
+                cursor: auto;
+            }
+
+            .cursor,
+            .cursor-dot {
+                display: none;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-subtitle {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-visual {
+                display: none;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn,
+            .download-badge,
+            .footer-links a {
+                cursor: pointer;
+            }
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 0 5vw;
+            }
+
+            header {
+                padding: 1rem 5vw;
+            }
+
+            .step-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .step-num {
+                font-size: 4rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .marquee-item {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cursor"></div>
+    <div class="cursor-dot"></div>
+    <div class="glow-orb"></div>
+    <div class="scroll-progress"></div>
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+    <div id="canvas-container"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="page-wrapper">
+        <header>
+            <div class="logo magnetic">
+                <div class="logo-icon"><span>8</span></div>
+                8 BALL PATH FINDER
+            </div>
+            <a href="https://play.google.com/store/apps/details?id=com.bored.jejemon.billardpathfinder&hl=en"
+                class="btn nav-cta magnetic">Download</a>
+        </header>
+
+        <section class="hero">
+            <div class="floating-ball"
+                style="width: 100px; height: 100px; background: radial-gradient(circle at 30% 30%, #f4d03f, #8b6914); top: 20%; right: 10%;">
+            </div>
+            <div class="floating-ball"
+                style="width: 60px; height: 60px; background: radial-gradient(circle at 30% 30%, #1a1a1a, #000); top: 60%; right: 20%; animation-delay: -5s;">
+            </div>
+            <div class="floating-ball"
+                style="width: 40px; height: 40px; background: radial-gradient(circle at 30% 30%, #c0392b, #7b241c); bottom: 20%; left: 5%; animation-delay: -10s;">
+            </div>
+
+            <div class="container">
+                <div class="hero-content">
+                    <div class="stagger-children active">
+                        <div class="rating-badge">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            <span>3.3 Rating · 1.96K Reviews</span>
+                        </div>
+                        <h1 class="split-text">MASTER<br>EVERY<br>SHOT</h1>
+                        <p class="hero-subtitle">The ultimate aiming assistant for 8-ball pool. Visualize trajectories,
+                            plan shots with precision, and dominate the table.</p>
+                        <div class="hero-buttons">
+                            <a href="https://play.google.com/store/apps/details?id=com.bored.jejemon.billardpathfinder&hl=en"
+                                class="btn magnetic">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                                </svg>
+                                Get on Google Play
+                            </a>
+                            <a href="#features" class="btn btn-outline magnetic">Learn More</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual"></div>
+                </div>
+            </div>
+        </section>
+
+        <div class="marquee-section">
+            <div class="marquee">
+                <div class="marquee-content">
+                    <div class="marquee-item">TRAJECTORY PREDICTION <span>●</span></div>
+                    <div class="marquee-item">4 REFLECTIONS <span>●</span></div>
+                    <div class="marquee-item">PRECISION AIMING <span>●</span></div>
+                    <div class="marquee-item">PRIVACY FIRST <span>●</span></div>
+                    <div class="marquee-item">FREE DOWNLOAD <span>●</span></div>
+                </div>
+                <div class="marquee-content">
+                    <div class="marquee-item">TRAJECTORY PREDICTION <span>●</span></div>
+                    <div class="marquee-item">4 REFLECTIONS <span>●</span></div>
+                    <div class="marquee-item">PRECISION AIMING <span>●</span></div>
+                    <div class="marquee-item">PRIVACY FIRST <span>●</span></div>
+                    <div class="marquee-item">FREE DOWNLOAD <span>●</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <div class="container">
+                <div class="stats-grid stagger-children">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="1960">0</div>
+                        <p class="stat-label">User Reviews</p>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="4">0</div>
+                        <p class="stat-label">Reflections</p>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="100">0</div>
+                        <p class="stat-label">% Local Processing</p>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="1.8" data-prefix="V" data-decimal="true">V0</div>
+                        <p class="stat-label">Latest Version</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="features-section" id="features">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">Features</span>
+                    <h2>PRECISION TOOLS</h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card reveal-left tilt-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-4-8c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z" />
+                            </svg>
+                        </div>
+                        <h3>PATH PREDICTION</h3>
+                        <p>Real-time trajectory visualization shows exactly where your cue ball and target balls will
+                            travel. Plan every shot with confidence.</p>
+                    </div>
+                    <div class="feature-card reveal-right tilt-card" style="transition-delay: 0.1s">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" />
+                            </svg>
+                        </div>
+                        <h3>GUIDE LINES</h3>
+                        <p>Intuitive overlay system provides precise guidance on optimal paths and bounce points,
+                            activated automatically when you aim.</p>
+                    </div>
+                    <div class="feature-card reveal-left tilt-card" style="transition-delay: 0.2s">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M7.5 21.5L3 17l1.4-1.4 3.1 3.1 6.1-6.1 1.4 1.4-7.5 7.5zM21 7l-3-3-2.1 2.1 3 3L21 7zm-9.4 3.5l-3-3L1 15.1V21h5.9l7.7-7.6-3-2.9z" />
+                            </svg>
+                        </div>
+                        <h3>4 REFLECTIONS</h3>
+                        <p>Calculate complex bank shots with up to 4 reflections. Master doubles and triples with
+                            pixel-perfect accuracy.</p>
+                    </div>
+                    <div class="feature-card reveal-right tilt-card" style="transition-delay: 0.3s">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+                            </svg>
+                        </div>
+                        <h3>PRIVACY FIRST</h3>
+                        <p>Zero external data transmission. All calculations happen locally on your device. Your
+                            gameplay stays private.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="steps-section">
+            <div class="container">
+                <div class="section-header reveal">
+                    <span class="section-tag">Getting Started</span>
+                    <h2>HOW IT WORKS</h2>
+                </div>
+                <div class="steps-container">
+                    <div class="step-row reveal">
+                        <div class="step-num">01</div>
+                        <div class="step-content">
+                            <h3>INSTALL</h3>
+                            <p>Download from Google Play and grant overlay permissions for instant visual feedback
+                                rendering on your screen.</p>
+                        </div>
+                    </div>
+                    <div class="step-row reveal">
+                        <div class="step-num">02</div>
+                        <div class="step-content">
+                            <h3>CALIBRATE</h3>
+                            <p>One-tap alignment system synchronizes the physics engine with your device's display for
+                                perfect accuracy.</p>
+                        </div>
+                    </div>
+                    <div class="step-row reveal">
+                        <div class="step-num">03</div>
+                        <div class="step-content">
+                            <h3>DOMINATE</h3>
+                            <p>The guides activate automatically when you aim and fade when you shoot. Take your pool
+                                game to the next level.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="download-section">
+            <div class="container reveal">
+                <span class="section-tag">Free Download</span>
+                <h2>READY TO<br>LEVEL UP?</h2>
+                <p>Join thousands of players improving their game with precision aiming assistance.</p>
+                <a href="https://play.google.com/store/apps/details?id=com.bored.jejemon.billardpathfinder&hl=en"
+                    class="download-badge magnetic">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.53,12.9 20.18,13.18L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                    </svg>
+                    <div class="download-badge-text">
+                        <small>GET IT ON</small>
+                        <span>Google Play</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <div class="footer-content">
+                    <div class="logo magnetic">
+                        <div class="logo-icon"><span>8</span></div>
+                        8 BALL PATH FINDER
+                    </div>
+                    <div class="footer-links">
+                        <a href="https://boredjejemon.com/8BallPathFinder/privacy_policy.html" target="_blank"
+                            class="magnetic">Privacy Policy</a>
+                        <a href="mailto:developersoap@gmail.com" class="magnetic">Contact</a>
+                    </div>
+                    <p class="footer-copy">© 2025 Bored Jejemon. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <a href="#" class="back-to-top magnetic">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
+        </svg>
+    </a>
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script
+        type="importmap">{"imports":{"three":"https://unpkg.com/three@0.158.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.158.0/examples/jsm/"}}</script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        const glowOrb = document.querySelector('.glow-orb');
+        let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0, dotX = 0, dotY = 0, glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            dotX += (mouseX - dotX) * 0.3;
+            dotY += (mouseY - dotY) * 0.3;
+            cursorDot.style.left = dotX + 'px';
+            cursorDot.style.top = dotY + 'px';
+            glowX += (mouseX - glowX) * 0.05;
+            glowY += (mouseY - glowY) * 0.05;
+            glowOrb.style.left = glowX + 'px';
+            glowOrb.style.top = glowY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover states
+        document.querySelectorAll('a, button, .btn, .feature-card, .magnetic').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+        });
+
+        // Magnetic Effect
+        document.querySelectorAll('.magnetic').forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+            });
+            el.addEventListener('mouseleave', () => { el.style.transform = 'translate(0, 0)'; });
+        });
+
+        // 3D Tilt Effect on Cards
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+                card.style.setProperty('--mouse-x', (x / rect.width * 100) + '%');
+                card.style.setProperty('--mouse-y', (y / rect.height * 100) + '%');
+            });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)'; });
+        });
+
+        // Scroll Progress
+        const scrollProgress = document.querySelector('.scroll-progress');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            scrollProgress.style.width = (scrollTop / docHeight) * 100 + '%';
+        });
+
+        // Header Scroll Effect
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 100); });
+
+        // Back to Top Button
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => { backToTop.classList.toggle('visible', window.scrollY > 500); });
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.stat-number[data-count]');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                    entry.target.classList.add('counted');
+                    const target = parseFloat(entry.target.dataset.count);
+                    const prefix = entry.target.dataset.prefix || '';
+                    const isDecimal = entry.target.dataset.decimal === 'true';
+                    const duration = 2000;
+                    const startTime = performance.now();
+                    function updateCounter(currentTime) {
+                        const elapsed = currentTime - startTime;
+                        const progress = Math.min(elapsed / duration, 1);
+                        const easeProgress = 1 - Math.pow(1 - progress, 3);
+                        const current = target * easeProgress;
+                        if (isDecimal) entry.target.textContent = prefix + current.toFixed(1);
+                        else if (target >= 1000) entry.target.textContent = prefix + (current / 1000).toFixed(2) + 'K+';
+                        else entry.target.textContent = prefix + Math.floor(current);
+                        if (progress < 1) requestAnimationFrame(updateCounter);
+                    }
+                    requestAnimationFrame(updateCounter);
+                }
+            });
+        }, { threshold: 0.5 });
+        counters.forEach(counter => counterObserver.observe(counter));
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .stagger-children').forEach(el => revealObserver.observe(el));
+
+        // Split Text Animation
+        document.querySelectorAll('.split-text').forEach(text => {
+            const content = text.innerHTML;
+            const lines = content.split('<br>');
+            text.innerHTML = lines.map(line => {
+                return line.split('').map((char, i) => {
+                    if (char === ' ') return ' ';
+                    return `<span class="char" style="animation-delay: ${i * 0.03}s">${char}</span>`;
+                }).join('');
+            }).join('<br>');
+        });
+
+        // Three.js Scene
+        const initThree = () => {
+            const container = document.getElementById('canvas-container');
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setClearColor(0x0a0f0d, 1);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x0a0f0d, 0.012);
+
+            const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 12, 16);
+            camera.lookAt(0, 0, 0);
+
+            // Pool Table
+            const feltGeometry = new THREE.BoxGeometry(14, 0.3, 7);
+            const feltMaterial = new THREE.MeshStandardMaterial({ color: 0x0d4a2b, roughness: 0.9 });
+            const felt = new THREE.Mesh(feltGeometry, feltMaterial);
+            felt.position.y = -0.15;
+            felt.receiveShadow = true;
+            scene.add(felt);
+
+            const railMaterial = new THREE.MeshStandardMaterial({ color: 0x2d1810, roughness: 0.6, metalness: 0.1 });
+            const longRailGeo = new THREE.BoxGeometry(14.5, 0.6, 0.5);
+            const railTop = new THREE.Mesh(longRailGeo, railMaterial);
+            railTop.position.set(0, 0.15, -3.75);
+            railTop.castShadow = true;
+            scene.add(railTop);
+            const railBottom = new THREE.Mesh(longRailGeo, railMaterial);
+            railBottom.position.set(0, 0.15, 3.75);
+            railBottom.castShadow = true;
+            scene.add(railBottom);
+            const shortRailGeo = new THREE.BoxGeometry(0.5, 0.6, 8);
+            const railLeft = new THREE.Mesh(shortRailGeo, railMaterial);
+            railLeft.position.set(-7.25, 0.15, 0);
+            railLeft.castShadow = true;
+            scene.add(railLeft);
+            const railRight = new THREE.Mesh(shortRailGeo, railMaterial);
+            railRight.position.set(7.25, 0.15, 0);
+            railRight.castShadow = true;
+            scene.add(railRight);
+
+            // Pockets
+            const pocketGeometry = new THREE.CircleGeometry(0.4, 32);
+            const pocketMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            [[-6.5, 0.01, -3.2], [6.5, 0.01, -3.2], [-6.5, 0.01, 3.2], [6.5, 0.01, 3.2], [0, 0.01, -3.4], [0, 0.01, 3.4]].forEach(pos => {
+                const pocket = new THREE.Mesh(pocketGeometry, pocketMaterial);
+                pocket.rotation.x = -Math.PI / 2;
+                pocket.position.set(...pos);
+                scene.add(pocket);
+            });
+
+            // Pool Balls
+            const balls = [];
+            const ballRadius = 0.28;
+            const ballGeometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+            const ballColors = [0xf8f8f2, 0xf4d03f, 0x2874a6, 0xc0392b, 0x8e44ad, 0xe67e22, 0x27ae60, 0x8b4513, 0x1a1a1a];
+
+            const createBall = (color, x, z, isEightBall = false, isCueBall = false) => {
+                const material = new THREE.MeshStandardMaterial({ color, roughness: isCueBall ? 0.1 : 0.2 });
+                const ball = new THREE.Mesh(ballGeometry, material);
+                ball.position.set(x, ballRadius, z);
+                ball.castShadow = true;
+                ball.receiveShadow = true;
+                if (isEightBall) {
+                    const stripeGeo = new THREE.CircleGeometry(0.12, 32);
+                    const stripeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+                    const stripe = new THREE.Mesh(stripeGeo, stripeMat);
+                    stripe.position.set(0, 0, ballRadius + 0.001);
+                    ball.add(stripe);
+                    const stripe2 = stripe.clone();
+                    stripe2.position.set(0, 0, -(ballRadius + 0.001));
+                    stripe2.rotation.y = Math.PI;
+                    ball.add(stripe2);
+                }
+                scene.add(ball);
+                return { mesh: ball, baseY: ballRadius };
+            };
+
+            balls.push(createBall(ballColors[0], -4, 0, false, true));
+            const rackX = 3, spacing = ballRadius * 2.1;
+            let ballIndex = 1;
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col <= row; col++) {
+                    const x = rackX + row * spacing * 0.866;
+                    const z = (col - row / 2) * spacing;
+                    const isEightBall = row === 2 && col === 1;
+                    const colorIndex = isEightBall ? 8 : (ballIndex % 8);
+                    balls.push(createBall(ballColors[colorIndex], x, z, isEightBall));
+                    ballIndex++;
+                }
+            }
+
+            // Aiming Line
+            const linePoints = [];
+            for (let i = 0; i < 100; i++) linePoints.push(new THREE.Vector3(-4 + i * 0.15, ballRadius + 0.01, 0));
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0xf4d03f, transparent: true, opacity: 0.8 });
+            const aimingLine = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(aimingLine);
+
+            // Cue Stick
+            const cueGeometry = new THREE.CylinderGeometry(0.03, 0.05, 8, 16);
+            const cueMaterial = new THREE.MeshStandardMaterial({ color: 0x4a2c1a, roughness: 0.4, metalness: 0.1 });
+            const cueStick = new THREE.Mesh(cueGeometry, cueMaterial);
+            cueStick.rotation.z = Math.PI / 2;
+            cueStick.position.set(-8.5, ballRadius, 0);
+            scene.add(cueStick);
+            const tipGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.15, 16);
+            const tipMaterial = new THREE.MeshStandardMaterial({ color: 0x3498db });
+            const cueTip = new THREE.Mesh(tipGeometry, tipMaterial);
+            cueTip.rotation.z = Math.PI / 2;
+            cueTip.position.set(-4.5, ballRadius, 0);
+            scene.add(cueTip);
+
+            // Lights
+            scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+            const mainLight = new THREE.SpotLight(0xfff5e6, 2);
+            mainLight.position.set(0, 10, 0);
+            mainLight.angle = Math.PI / 4;
+            mainLight.penumbra = 0.5;
+            mainLight.decay = 1.5;
+            mainLight.distance = 30;
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 1024;
+            mainLight.shadow.mapSize.height = 1024;
+            scene.add(mainLight);
+            const accentLight1 = new THREE.PointLight(0xf4d03f, 0.5);
+            accentLight1.position.set(-5, 5, -3);
+            scene.add(accentLight1);
+            const accentLight2 = new THREE.PointLight(0x00ff9d, 0.3);
+            accentLight2.position.set(5, 5, 3);
+            scene.add(accentLight2);
+
+            // Particles
+            const particlesGeo = new THREE.BufferGeometry();
+            const particleCount = 800;
+            const posArray = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 80;
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMat = new THREE.PointsMaterial({ size: 0.04, color: 0x2a5a3a, transparent: true, opacity: 0.5 });
+            const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+            scene.add(particlesMesh);
+
+            // Post Processing
+            const composer = new EffectComposer(renderer);
+            composer.addPass(new RenderPass(scene, camera));
+            const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.5, 0.4, 0.85);
+            bloom.threshold = 0.6;
+            bloom.strength = 0.5;
+            bloom.radius = 0.4;
+            composer.addPass(bloom);
+
+            // Animation
+            let scrollY = 0, time = 0, targetMouseX = 0, targetMouseY = 0, currentMouseX = 0, currentMouseY = 0;
+            window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+            document.addEventListener('mousemove', (e) => {
+                targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                time += 0.01;
+                currentMouseX += (targetMouseX - currentMouseX) * 0.02;
+                currentMouseY += (targetMouseY - currentMouseY) * 0.02;
+
+                const targetCamY = 12 - (scrollY * 0.003) + currentMouseY * 0.5;
+                const targetCamZ = 16 + (scrollY * 0.002);
+                const targetCamX = currentMouseX * 2;
+                camera.position.y += (targetCamY - camera.position.y) * 0.05;
+                camera.position.z += (targetCamZ - camera.position.z) * 0.05;
+                camera.position.x += (targetCamX - camera.position.x) * 0.05;
+                camera.lookAt(0, 0, 0);
+
+                const aimAngle = Math.sin(time * 0.5) * 0.3 + currentMouseX * 0.2;
+                const positions = aimingLine.geometry.attributes.position.array;
+                for (let i = 0; i < 100; i++) {
+                    const t = i / 100;
+                    positions[i * 3] = -4 + i * 0.08;
+                    positions[i * 3 + 2] = Math.sin(aimAngle) * t * 3;
+                }
+                aimingLine.geometry.attributes.position.needsUpdate = true;
+
+                balls.forEach((ball, index) => {
+                    ball.mesh.position.y = ball.baseY + Math.sin(time * 2 + index) * 0.01;
+                    ball.mesh.rotation.x += 0.002;
+                    ball.mesh.rotation.z += 0.001;
+                });
+
+                cueStick.position.z = Math.sin(aimAngle) * 0.5;
+                cueTip.position.z = Math.sin(aimAngle) * 0.5;
+                cueStick.rotation.y = aimAngle * 0.2;
+                cueTip.rotation.y = aimAngle * 0.2;
+                const pullBack = Math.sin(time * 3) * 0.3;
+                cueStick.position.x = -8.5 - Math.max(0, pullBack);
+                cueTip.position.x = -4.5 - Math.max(0, pullBack);
+
+                particlesMesh.rotation.y += 0.0003;
+                particlesMesh.rotation.x = currentMouseY * 0.1;
+
+                composer.render();
+            }
+            animate();
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                composer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initThree);
+        else initThree();
+    </script>
+</body>
+
+</html>
