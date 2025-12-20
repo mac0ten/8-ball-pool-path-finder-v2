@@ -131,7 +131,7 @@ You have the following rights regarding your personal information:
 - Opt-Out: Disable personalized advertising in device settings
 
 7.2 HOW TO EXERCISE YOUR RIGHTS
-Contact us at: [YOUR SUPPORT EMAIL]
+Contact us at: developersoap@gmail.com
 We will respond to your request within 30 days.
 
 7.3 ADVERTISING CHOICES
@@ -166,7 +166,6 @@ For users in the European Economic Area (EEA):
 - Data Portability: Request your data in a portable format
 - Right to Object: Object to processing of your personal data
 - Withdrawal of Consent: Withdraw consent at any time
-- Data Protection Officer: [CONTACT IF APPLICABLE]
 
 ==================================
 11. INTERNATIONAL DATA TRANSFERS
@@ -197,9 +196,9 @@ The App does not currently respond to "Do Not Track" (DNT) signals from browsers
 
 If you have questions or concerns about this Privacy Policy, please contact us:
 
-Email: [YOUR SUPPORT EMAIL]
-Website: http://boredjejemon.com/8BallPathFinder/
-Support: [YOUR SUPPORT CHANNEL]
+Email: developersoap@gmail.com
+Website: https://mac0ten.github.io/8-ball-pool-path-finder-v2/
+Support: developersoap@gmail.com
 
 For privacy-specific inquiries or to exercise your privacy rights, please include "Privacy Request" in your email subject line.
 
