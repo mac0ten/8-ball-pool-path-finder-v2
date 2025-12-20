@@ -368,9 +368,9 @@ Trajectory calculations are approximations and do not account for all real-world
 
 For questions about these Terms, please contact us:
 
-General Support: [YOUR SUPPORT EMAIL]
-Legal Inquiries: [YOUR LEGAL EMAIL]
-Website: http://boredjejemon.com/8BallPathFinder/
+General Support: developersoap@gmail.com
+Legal Inquiries: developersoap@gmail.com
+Website: https://mac0ten.github.io/8-ball-pool-path-finder-v2/
 
 Response time: Within 5 business days for most inquiries.
 
